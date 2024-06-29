@@ -1,0 +1,74 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: "2921312"
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: microdata
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: microdata
+
+
+#DEFINIMOS LAS LAMBDAS DE TAL MANERA QUE TENGAMOS POR CADA FUNCIÓN: 246MB DE MEMORIA ASIGNADA, 512MB DE ALMACENAMIENTO EFIMERO Y 3 SEGUNDOS DE EJECUCIÓN
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-2
+  memorySize: 256 #MEMORIA ASIGNADA
+  timeout: 3 #TIEMPO DE EJECUCIÓN POR FUNCIÓN
+  runtimeManagement: auto #GESTIONADOR DEL RUNTIME (NODEJS20 .X) AUTO=TRUE
+  versionFunctions: false #VERSIONAMIENTO DE LAS LAMBDAS - SI SE ACOPLAN MUCHAS PUEDE HABER UN COSTO ADICIONAL
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:Scan
+      Resource:
+        - arn:aws:dynamodb:us-east-2:975049989396:table/productTable
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://localhost:8080
+      allowedHeaders:
+        - Content-Type
+      allowedMethods:
+        - GET
+      allowCredentials: true
+      exposedResponseHeaders:
+        - Special-Response-Header
+      maxAge: 6000 # In seconds
+functions:
+  createProduct:
+    handler: src/createProduct.createProduct
+    events:
+      - httpApi:
+          path: /product
+          method: post
+    ephemeralStorageSize: 512 #ALMACENAMIENTO EFIMERO
+
+  updateProductStock:
+    handler: src/updateProduct.updateProduct
+    events:
+      - httpApi:
+          path: /product/{id}/stock
+          method: put
+    ephemeralStorageSize: 512 #ALMACENAMIENTO EFIMERO
+  listProducts:
+    handler: src/listProducts.listProducts
+    events:
+      - httpApi:
+          path: /products
+          method: get
+    ephemeralStorageSize: 512 #ALMACENAMIENTO EFIMERO
+resources:
+  Resources:
+    productTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: productTable
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
