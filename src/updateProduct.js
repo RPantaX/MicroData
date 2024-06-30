@@ -8,7 +8,7 @@ exports.updateProduct = async (event) => {
       const { stock } = JSON.parse(event.body);
   
       const params = {
-        TableName: 'ProductInventory',
+        TableName: 'productTable',
         Key: {id},
         UpdateExpression: 'SET stock = :newStock',
         ExpressionAttributeValues: {

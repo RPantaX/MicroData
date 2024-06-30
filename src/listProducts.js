@@ -3,7 +3,7 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 exports.listProducts = async () => {
     try {
       const params = {
-        TableName: 'ProductInventory'
+        TableName: 'productTable'
       };
       //transformamos el callback a una promesa.
       const result = await dynamodb.scan(params).promise();
