@@ -1,28 +1,37 @@
 const { v4 } = require("uuid");
 const AWS = require('aws-sdk');
+const { validateProductData } = require("./validations/validationProduct");
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 exports.createProduct = async (event) => {
-  //recibimos los atributos de parte del usuario de tal manera que sean solo los atributos específicos que necesitamos.
+  //we receive the attributes from the user in such a way that they are only the specific attributes we need.
   const { nombreProducto, descripcion, precio, stock } = JSON.parse(event.body);
-  //registros que mandaremos a nuestra tabla.
+  // Validations
+  const validationError = validateProductData(nombreProducto, descripcion, precio, stock);
+  if (validationError) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: validationError })
+    };
+  }
+  //records that we will send to our table.
   const id = v4();
+  const newItem = {
+    id,
+    nombreProducto,
+    descripcion,
+    precio,
+    stock
+  };
   const params = {
     TableName: 'productTable',
-    Item: {
-        id,
-        nombreProducto,
-        descripcion,
-        precio,
-        stock
-    }
+    Item: newItem
   };
-  //enviamos los datos.
+  //send the data
   try {
-        //transformamos el callback a una promesa.
         await dynamodb.put(params).promise();
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: 'Product created successfully' })
+            body: JSON.stringify(newItem)
         };
     } catch (error) {
         return {

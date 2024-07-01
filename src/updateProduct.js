@@ -1,12 +1,19 @@
 const AWS = require('aws-sdk');
+const { validateOnlyStock } = require('./validations/validationProduct');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 exports.updateProduct = async (event) => {
-    //También podríamos haber transformado el callback a una promesa.
-    //Actualizar los datos.
+    //update data.
     try {
       const {id} = event.pathParameters;
       const { stock } = JSON.parse(event.body);
-  
+      // Validations
+      const validationError = validateOnlyStock(stock);
+      if (validationError) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ error: validationError })
+        };
+      }
       const params = {
         TableName: 'productTable',
         Key: {id},
@@ -16,7 +23,7 @@ exports.updateProduct = async (event) => {
         },
         ReturnValues: 'UPDATED_NEW'
       };
-    //transformamos el callback a una promesa.
+    //we transform the callback to a promise.
       const result = await dynamodb.update(params).promise();
   
       return {

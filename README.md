@@ -1,69 +1,82 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in NodeJS'
-description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: nodeJS
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Backend de Gestión de Productos
 
-# Serverless Framework Node HTTP API on AWS
+Este es el backend de una aplicación de gestión de productos construida con Serverless Framework en AWS. Permite la creación, actualización y listado de productos utilizando AWS Lambda y DynamoDB.
 
-This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.
+## Estructura del Proyecto
+/project-root
+  /src
+    /validations
+      validationProduct.js
+  createProduct.js
+  updateProduct.js
+  listProducts.js
+  serverless.yml
+  package.json
 
-This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes Typescript, Mongo, DynamoDB and other examples.
+## Prerrequisitos
 
-## Usage
+- Node.js v20.x o superior
+- Serverless Framework CLI instalado globalmente:
+  ```bash
+  npm install -g serverless
 
-### Deployment
+- AWS CLI configurado con las credenciales adecuadas
 
-In order to deploy the example, you need to run the following command:
+## Configuración
+1. Clona el repositorio:
+  git clone https://github.com/tu-usuario/product-management-backend.git
+  cd product-management-backend
 
-```
-serverless deploy
-```
+2. Instala las dependencias:
+  npm install
 
-After running deploy, you should see output similar to:
+3. Configura tus credenciales de AWS en la CLI:
+  aws configure
 
-```
-Deploying "serverless-http-api" to stage "dev" (us-east-1)
+## Despliegue
+Para desplegar el backend en AWS, utiliza Serverless Framework:
+  serverless deploy
+Esto desplegará las funciones Lambda y la tabla DynamoDB configuradas en serverless.yml.
 
-✔ Service deployed to stack serverless-http-api-dev (91s)
+# Estructura de Serverless.yml
+## Provider
+Configuración del proveedor AWS con detalles como la región, tamaño de memoria, tiempo de ejecución, etc.
 
-endpoint: GET - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/
-functions:
-  hello: serverless-http-api-dev-hello (1.6 kB)
-```
+## Funciones
+- createProduct: Lambda para crear un nuevo producto.
+- updateProductStock: Lambda para actualizar el stock de un producto.
+- listProducts: Lambda para listar todos los productos.
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [HTTP API (API Gateway V2) event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api).
+## Recursos
+- productTable: Definición de la tabla DynamoDB para almacenar los productos. Utiliza facturación bajo demanda (PAY_PER_REQUEST).
 
-### Invocation
+# Uso
+## Crear un Producto
+Envía una solicitud POST a https://l01ezc294j.execute-api.us-east-2.amazonaws.com/product con el cuerpo JSON que contiene los datos del producto.
+Ej:
+  {
+    "nombreProducto": "gaseosa",
+    "descripcion": "cocacola",
+    "precio": 4.30,
+    "stock": 3.5
+  }
 
-After successful deployment, you can call the created application via HTTP:
+## Actualizar el Stock de un Producto
+Envía una solicitud PUT a https://l01ezc294j.execute-api.us-east-2.amazonaws.com/product/ded6e6a3-0cde-4da5-8721-754513188ea9/stock con el cuerpo JSON que contiene el nuevo stock del producto.
+Ej:
+  {
+    "stock": 6.90
+  }
+## Listar Todos los Productos
+Envía una solicitud GET a https://l01ezc294j.execute-api.us-east-2.amazonaws.com/products para obtener una lista de todos los productos.
 
-```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
-```
+# Desarrollo Local
+Para ejecutar el backend localmente:
 
-Which should result in response similar to:
-
-```json
-{ "message": "Go Serverless v4! Your function executed successfully!" }
-```
-
-### Local development
-
-The easiest way to develop and test your function is to use the `dev` command:
-
-```
-serverless dev
-```
-
-This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
-
-Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
-
-When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+1. Instala el plugin serverless-offline:
+  npm install serverless-offline --save-dev
+2. Agrega el plugin a serverless.yml:
+  plugins:
+  - serverless-offline
+3. Ejecuta el backend localmente:
+  serverless offline

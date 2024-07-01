@@ -5,14 +5,14 @@ exports.listProducts = async () => {
       const params = {
         TableName: 'productTable'
       };
-      //transformamos el callback a una promesa.
+      //we transform the callback to a promise.
       const result = await dynamodb.scan(params).promise();
   
       return {
         statusCode: 200,
-        body: JSON.stringify({
-          products: result.Items
-        })
+        body: JSON.stringify(
+           result.Items
+        )
       };
     } catch (error) {
       return {

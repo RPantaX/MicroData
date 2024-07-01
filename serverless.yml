@@ -27,11 +27,13 @@ provider:
   httpApi:
     cors:
       allowedOrigins:
-        - https://localhost:8080
+        - http://localhost:5173
       allowedHeaders:
         - Content-Type
       allowedMethods:
         - GET
+        - POST
+        - PUT
       allowCredentials: true
       exposedResponseHeaders:
         - Special-Response-Header
