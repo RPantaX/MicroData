@@ -24,7 +24,7 @@ Este es el backend de una aplicación de gestión de productos construida con Se
 
 ## Configuración
 1. Clona el repositorio:
-  git clone https://github.com/tu-usuario/product-management-backend.git
+  git clone https://github.com/RPantaX/MicroData.git
   cd product-management-backend
 
 2. Instala las dependencias:
